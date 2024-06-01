@@ -6,10 +6,23 @@ bits 64
 default rel
 global asmfunc
 
-asmfunc:
+asm_1D_stencil:
+
+
+xor rax, rax
+ret
 
 
 
+xmm_1D_stencil:
+
+
+xor rax, rax
+ret
+
+
+
+ymm_1D_stencil:
 
 
 xor rax, rax

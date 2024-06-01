@@ -2,18 +2,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <time.h>
+#include <stdint.h>
 
-extern int asmfunc();
+extern void asm_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y);
+extern void xmm_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y);
+extern void ymm_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y);
 
-void c_1D_stencil() {
-	
+void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
+	size_t i;
+	for (i = 3; i < (ARRAY_SIZE - 3); i++)
+		y[i] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3]; //clarify if store at 0 index or first 3 y vector elements are empty
 }
 
 
 int main() {
-	const size_t ARRAY_SIZE = 1 << 20;
+	const size_t ARRAY_SIZE = 10; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
+	const size_t loopcount = 30;
 	int i;
-	int* x, y;
+	int32_t * x, * y;
+	clock_t start, end; 
+	double time_taken, time_total, time_average; 
+	time_t t;
+	srand((unsigned int)time(&t));
+
+	printf("Number of elements = %zd\n", ARRAY_SIZE);
+	x = (int32_t*)malloc(ARRAY_BYTES);
+	if (x == NULL)
+		exit(1);
+	y = (int32_t*)malloc(ARRAY_BYTES);
+	if (y == NULL)
+		exit(1);
+	
+	//edit to generate random later
+	//clarify what the bound of random values are
+	for (i = 0; i < ARRAY_SIZE; i++) {
+		x[i] = (int32_t)rand();
+		y[i] = 0;
+	}
+
+	//one function template
+	start = clock();
+	c_1D_stencil(ARRAY_SIZE, x, y); //call function
+	end = clock();
+	time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
+	printf("First run initialization. Time in C: %lf ms\n", time_taken);
+
+	time_total = 0.0;
+	for (i = 0; i < loopcount; i++) {
+		start = clock();
+		c_1D_stencil(ARRAY_SIZE, x, y); //call function
+		end = clock();
+		time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
+		printf("Run #%d. Time in C: %lf ms\n", i, time_taken);
+		time_total += time_taken;
+	}
+	printf("Output Y: ");
+
+	// Use while testing with small arrays
+	for (int j = 0; j < ARRAY_SIZE; j++)
+		printf("%d ", y[j]);
+
+	// Don't use without big arrays
+	/*
+	for (int j = 0; j < 10; j++)
+		printf("%d ", y[j]);
+	for (int j = ARRAY_SIZE - 10; j < ARRAY_SIZE; j++)
+		printf("%d ", y[j]);
+	*/
+	printf("\n");
+	time_average = time_total / loopcount;
+	printf("Total time taken in C: %lf ms. Average C runtime across 30 executions: %lf ms.\n", time_total, time_average);
+
+
+
+
+	free(x);
+	free(y);
 	return 0;
 }
