@@ -5,7 +5,15 @@
 
 extern int asmfunc();
 
+void c_1D_stencil() {
+	
+}
+
+
 int main() {
-	asmfunc();
+	const size_t ARRAY_SIZE = 1 << 20;
+	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
+	int i;
+	int* x, y;
 	return 0;
 }
