@@ -3,6 +3,8 @@ section .text
 bits 64
 default rel
 global asm_1D_stencil
+global xmm_1D_stencil
+global ymm_1D_stencil
 
 ; RCX - ARRAY_SIZE
 ; RDX - Address of input vector x -> [rdx] is value of x 
@@ -11,21 +13,31 @@ global asm_1D_stencil
 
 asm_1D_stencil:
 	mov r10, rcx
-	sub r10, 6
+	sub r10, 1
 L1:
 	xor rax, rax
 	mov rcx, 7
 	L2: 
 		add rax, [rdx]
-		add rdx, 32
+		add rdx, 4
 		loop L2
 
-	sub rdx, 192
+	sub rdx, 24
 	mov [r8], rax
-	add r8, 32
+	add r8, 4
 	dec r10
 	cmp r10, 0
-	jnz L1 ;this is the problem code
+	jnz L1
+
+	xor rax, rax
+	ret
+
+xmm_1D_stencil:
+
+	xor rax, rax
+
+
+ymm_1D_stencil:
 
 	xor rax, rax
 	ret
