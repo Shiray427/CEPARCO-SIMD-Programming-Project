@@ -80,7 +80,7 @@ int main() {
 	time_total = 0.0;
 	for (i = 0; i < loopcount; i++) {
 		start = clock();
-		asm_1D_stencil(ARRAY_SIZE, x, y); //call function
+		asm_1D_stencil(ARRAY_SIZE, x, y); //call function 
 		end = clock();
 		time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
 		printf("Run #%d. Time in x86-64 ASM: %lf ms\n", i, time_taken);
@@ -96,7 +96,7 @@ int main() {
 
 	printf("\n");
 	time_average = time_total / loopcount;
-	printf("Total time taken in C: %lf ms.\nAverage C runtime across 30 executions: %lf ms.\n", time_total, time_average);
+	printf("Total time taken in x86-64 ASM: %lf ms.\nAverage x86-64 ASM runtime across 30 executions: %lf ms.\n", time_total, time_average);
 
 
 
