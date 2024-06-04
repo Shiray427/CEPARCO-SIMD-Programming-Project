@@ -9,12 +9,40 @@ Write the kernel in (1) C program; (2) an x86-64 assembly language; (3) x86 SIMD
 
 *Example: X-> 1.2.3.4.5.6.7.8: output: Y-> 28.35*
 
-## Screenshot of Test Cases
+## Implementation
 ### C
-blah
+```
+void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
+    for (size_t i = 3; i < ARRAY_SIZE - 3; i++) {
+        y[i - 3] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3];
+    }
+}
+```
 
 ### ASM x86-64
-blah
+```
+asm_1D_stencil:
+	mov r10, rcx
+	sub r10, 1
+L1:
+	xor rax, rax
+	mov rcx, 7
+	L2: 
+		add rax, [rdx]
+		add rdx, 4
+		loop L2
+
+	sub rdx, 24
+	mov [r8], rax
+	add r8, 4
+	dec r10
+	cmp r10, 0
+	jnz L1
+
+	xor rax, rax
+	ret
+```
+
 
 ### SIMD XMM register
 blah
