@@ -18,6 +18,7 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
     }
 }
 ```
+This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the array x
 
 ### ASM x86-64
 ```
@@ -42,7 +43,7 @@ L1:
 	xor rax, rax
 	ret
 ```
-
+This implementation has the same logic as the c function but at a lower level. The outer loop (L1) iterates through the array, while the inner loop (L2) sums the 7 elements.
 
 ### SIMD XMM register
 ```
@@ -72,12 +73,28 @@ xmm_1D_stencil:
 	xor rax, rax
 	ret
 ```
+This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements.
 
 ### SIMD YMM register
 ```
 ymm_1D_stencil:
 ```
+This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction operates on 8 packed integers, doubling the parallelism compared to the XMM implementation.
 
 ## Table of Execution Time
-blah
+### Debug Mode
+|   | 2^20 | 2^26 | 2^30 |
+| ------------- |-------------|------------- |------------- |
+| C Implementation | right foo     | right foo     | right foo     |
+| x86-64 Assembly | right bar     | right foo     | right foo     |
+| SIMD XMM | right baz     | right foo     | right foo     |
+| SIMD YMM | right baz     | right foo     | right foo     |
+
+### Release Mode
+|   | 2^20 | 2^26 | 2^30 |
+| ------------- |-------------|------------- |------------- |
+| C Implementation | right foo     | right foo     | right foo     |
+| x86-64 Assembly | right bar     | right foo     | right foo     |
+| SIMD XMM | right baz     | right foo     | right foo     |
+| SIMD YMM | right baz     | right foo     | right foo     |
 
