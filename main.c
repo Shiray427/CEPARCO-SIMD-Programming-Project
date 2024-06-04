@@ -16,7 +16,7 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 }
 
 int main() {
-	const size_t ARRAY_SIZE = 1 << 30; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 20) + 6; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -69,7 +69,8 @@ int main() {
 	printf("\n");
 	time_average = time_total / loopcount;
 	printf("Total time taken in C: %lf ms.\nAverage C runtime across 30 executions: %lf ms.\n", time_total, time_average);
-
+	
+	
 	//x86-64 ASM function
 	start = clock();
 	asm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
@@ -97,7 +98,9 @@ int main() {
 	printf("\n");
 	time_average = time_total / loopcount;
 	printf("Total time taken in x86-64 ASM: %lf ms.\nAverage x86-64 ASM runtime across 30 executions: %lf ms.\n", time_total, time_average);
+	
 
+	
 	//x86 SIMD AVX2 ASM function using XMM
 	start = clock();
 	xmm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
@@ -125,7 +128,7 @@ int main() {
 	printf("\n");
 	time_average = time_total / loopcount;
 	printf("Total time taken in x86-64 SSE2: %lf ms.\nAverage x86-64 SSE2 runtime across 30 executions: %lf ms.\n", time_total, time_average);
-
+	
 
 	//x86 SIMD AVX2 ASM function using YMM
 	start = clock();
@@ -145,7 +148,7 @@ int main() {
 	}
 	printf("Output Y: \n");
 	printf("First 10 elements: ");
-	for (int j = 0; j < 10; j++)
+	for (int j = 0; j < 100; j++)
 		printf("%d ", y[j]);
 	printf("\nLast 10 elements: ");
 	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)

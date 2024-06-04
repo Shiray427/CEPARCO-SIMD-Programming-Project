@@ -33,7 +33,7 @@ L1:
 	ret
 
 xmm_1D_stencil:
-	sub rcx, 0x0000_0000_0000_0111
+	sub rcx, 0x0000_0000_0000_0007
 	xor rsi, rsi
 	xmmloop1:
 		movdqu xmm0, [rdx+rsi*4]
@@ -49,8 +49,8 @@ xmm_1D_stencil:
 		paddd xmm0, xmm6
 		paddd xmm2, xmm4
 		paddd xmm0, xmm2
-		add rsi, 0x0000_0000_0000_0100
-		sub rcx, 0x0000_0000_0000_0100
+		add rsi, 0x0000_0000_0000_0004
+		sub rcx, 0x0000_0000_0000_0004
 		cmp rcx, 0x0
 		jg xmmloop1
 
@@ -59,7 +59,7 @@ xmm_1D_stencil:
 
 
 ymm_1D_stencil:
-	sub rcx, 0x0000_0000_0000_0111
+	sub rcx, 0x0000_0000_0000_0007
 	xor rsi, rsi
 	ymmloop1:
 		vmovdqu ymm0, [rdx+rsi*4]
@@ -76,8 +76,8 @@ ymm_1D_stencil:
 		vpaddd ymm11, ymm8, ymm9
 		vpaddd ymm12, ymm10, ymm11
 		vmovdqu [R8+rsi*4], ymm12
-		add rsi, 0x0000_0000_0000_1000
-		sub rcx, 0x0000_0000_0000_1000
+		add rsi, 0x0000_0000_0000_0008
+		sub rcx, 0x0000_0000_0000_0008
 		cmp rcx, 0x0
 		jg ymmloop1
 
