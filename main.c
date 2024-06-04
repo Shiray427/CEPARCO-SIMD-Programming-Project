@@ -16,7 +16,7 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 }
 
 int main() {
-	const size_t ARRAY_SIZE = 1 << 26; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = 1 << 30; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -41,8 +41,6 @@ int main() {
 	
 	for (i = 0; i < Y_ARRAY_SIZE; i++) 
 		y[i] = 0;
-	
-	ymm_1D_stencil(Y_ARRAY_SIZE, x, y);
 
 	//C function 
 	start = clock();
