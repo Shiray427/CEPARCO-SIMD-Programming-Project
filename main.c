@@ -23,8 +23,20 @@ size_t error_counter(size_t ARRAY_SIZE, int32_t* y1, int32_t* y2) {
 	return count;
 }
 
+void print_text(double time_average, double time_total, size_t loopcount, size_t Y_ARRAY_SIZE, int32_t out[], char text[]) {
+	time_average = time_total / loopcount;
+	printf("Total time taken in %s: %lf ms.\nAverage runtime across 30 %s executions: %lf ms.\n", text, time_total, text, time_average);
+	printf("Output Y: \n");
+	printf("First 10 elements: ");
+	for (int j = 0; j < 10; j++)
+		printf("%d ", out[j]);
+	printf("\nLast 10 elements: ");
+	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
+		printf("%d ", out[j]);
+	printf("\n");
+}
 int main() {
-	const size_t ARRAY_SIZE = (1 << 30) ; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 20) ; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -85,15 +97,7 @@ int main() {
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	printf("Total time taken in C: %lf ms.\nAverage runtime across 30 C executions: %lf ms.\n", time_total, time_average);
-	printf("Output Y: \n");
-	printf("First 10 elements: ");
-	for (int j = 0; j < 10; j++)
-		printf("%d ", y_c[j]);
-	printf("\nLast 10 elements: ");
-	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
-		printf("%d ", y_c[j]);
-	printf("\n");
+	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "C");
 	
 	
 	//x86-64 ASM function
@@ -113,15 +117,7 @@ int main() {
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	printf("Total time taken in x86-64 ASM: %lf ms.\nAverage runtime across 30 x86-64 ASM executions: %lf ms.\n", time_total, time_average);
-	printf("Output Y: \n");
-	printf("First 10 elements: ");
-	for (int j = 0; j < 10; j++)
-		printf("%d ", y_asm[j]); 
-	printf("\nLast 10 elements: ");
-	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
-		printf("%d ", y_asm[j]);
-	printf("\n");
+	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_asm, "x86-64 ASM");
 	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_asm);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 
@@ -143,15 +139,7 @@ int main() {
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	printf("Total time taken in x86 SIMD AVX2 using XMM register: %lf ms.\nAverage runtime across 30 x86 SIMD AVX2 using XMM register executions: %lf ms.\n", time_total, time_average);
-	printf("Output Y: \n");
-	printf("First 10 elements: ");
-	for (int j = 0; j < 10; j++)
-		printf("%d ", y_xmm[j]);
-	printf("\nLast 10 elements: ");
-	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
-		printf("%d ", y_xmm[j]);
-	printf("\n");
+	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "x86 SIMD AVX2 using XMM register");
 	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_xmm);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
@@ -173,15 +161,7 @@ int main() {
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	printf("Total time taken in x86 SIMD AVX2 using YMM register: %lf ms.\nAverage runtime across 30 x86 SIMD AVX2 using YMM register executions: %lf ms.\n", time_total, time_average);
-	printf("Output Y: \n");
-	printf("First 10 elements: ");
-	for (int j = 0; j < 10; j++)
-		printf("%d ", y_ymm[j]);
-	printf("\nLast 10 elements: ");
-	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
-		printf("%d ", y_ymm[j]);
-	printf("\n");
+	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "x86 SIMD AVX2 using YMM register");
 	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_ymm);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
