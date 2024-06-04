@@ -1,6 +1,5 @@
 # CEPARCO SIMD Programming Project
-Write the kernel in (1) C program; (2) an x86-64 assembly language; (3) x86 SIMD AVX2 assembly language using XMM register; (4) x86 SIMD AVX2 assembly language using YMM register. The kernel is to perform 1-D stencil of vector X place the result in vector Y. 
-
+#### AMBROSIO, ARCETA, MENDOZA, TAN
 **Input**: Memory location n (integer) contains the length of the vector; Vectors X and Y are both 32-bit integer. 
 
 **Process**: Y = X[i - 3] + X[i — 2] + X[i — 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
@@ -10,6 +9,7 @@ Write the kernel in (1) C program; (2) an x86-64 assembly language; (3) x86 SIMD
 *Example: X-> 1.2.3.4.5.6.7.8: output: Y-> 28.35*
 
 ## Implementation
+This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the assembly and SIMD implementations are compared with the C version to confirm the correctness, and the last and first 10 elements of the output vectors are presented for verification.
 ### C
 #### Code
 ```
@@ -19,7 +19,7 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
     }
 }
 ```
-This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the array x
+This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the array x.
 
 #### Screenshot
 
@@ -94,6 +94,8 @@ This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction
 #### Screenshot
 
 ## Table of Execution Time
+Execution times for each implementation are measured in both DEBUG and RELEASE mode. The kernel is ran 30 times to calculate the average runtime. Below is the table of average runtime of each implementation.
+
 ### Debug Mode
 |   | 2^20 | 2^26 | 2^30 |
 | ------------- |-------------|------------- |------------- |
