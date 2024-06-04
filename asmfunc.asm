@@ -49,6 +49,7 @@ xmm_1D_stencil:
 		paddd xmm0, xmm6
 		paddd xmm2, xmm4
 		paddd xmm0, xmm2
+		movdqu [R8+rsi*4], xmm0
 		add rsi, 0x0000_0000_0000_0004
 		sub rcx, 0x0000_0000_0000_0004
 		cmp rcx, 0x0
