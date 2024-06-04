@@ -24,7 +24,7 @@ size_t error_counter(size_t ARRAY_SIZE, int32_t* y1, int32_t* y2) {
 }
 
 int main() {
-	const size_t ARRAY_SIZE = (1 << 26); //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 30) ; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -158,7 +158,7 @@ int main() {
 
 	//x86 SIMD AVX2 ASM function using YMM register
 	start = clock();
-	ymm_1D_stencil(Y_ARRAY_SIZE, x, y_ymm); //call function
+	ymm_1D_stencil(Y_ARRAY_SIZE , x, y_ymm); //call function
 	end = clock();
 	time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
 	printf("First run initialization. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", time_taken);
@@ -183,7 +183,7 @@ int main() {
 		printf("%d ", y_ymm[j]);
 	printf("\n");
 	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_ymm);
-	printf("Output value comparison with C output vector count: %zd\n", error_count);
+	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
 	free(x);
 	free(y_c);
