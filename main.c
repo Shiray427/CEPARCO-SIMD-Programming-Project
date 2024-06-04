@@ -42,7 +42,7 @@ int main() {
 	for (i = 0; i < Y_ARRAY_SIZE; i++) 
 		y[i] = 0;
 	
-		
+	ymm_1D_stencil(Y_ARRAY_SIZE, x, y);
 
 	//C function 
 	start = clock();
@@ -104,7 +104,32 @@ int main() {
 
 
 	//x86 SIMD AVX2 ASM function using YMM
+	start = clock();
+	ymm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
+	end = clock();
+	time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
+	printf("First run initialization. Time in x86-64 AVX2: %lf ms\n", time_taken);
 
+	time_total = 0.0;
+	for (i = 0; i < loopcount; i++) {
+		start = clock();
+		ymm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function 
+		end = clock();
+		time_taken = (double)(end - start) * 1e3 / CLOCKS_PER_SEC;
+		printf("Run #%d. Time in x86-64 AVX2: %lf ms\n", i, time_taken);
+		time_total += time_taken;
+	}
+	printf("Output Y: \n");
+	printf("First 10 elements: ");
+	for (int j = 0; j < 10; j++)
+		printf("%d ", y[j]);
+	printf("\nLast 10 elements: ");
+	for (int j = Y_ARRAY_SIZE - 10; j < Y_ARRAY_SIZE; j++)
+		printf("%d ", y[j]);
+
+	printf("\n");
+	time_average = time_total / loopcount;
+	printf("Total time taken in x86-64 AVX2: %lf ms.\nAverage x86-64 AVX2 runtime across 30 executions: %lf ms.\n", time_total, time_average);
 
 	free(x);
 	free(y);
