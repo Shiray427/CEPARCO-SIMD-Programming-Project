@@ -111,5 +111,5 @@ This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction
 | SIMD YMM | right baz     | right foo     | right foo     |
 
 ## Conclusion
-yes yes
+no no 
 
