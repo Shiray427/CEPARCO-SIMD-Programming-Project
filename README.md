@@ -11,6 +11,7 @@ Write the kernel in (1) C program; (2) an x86-64 assembly language; (3) x86 SIMD
 
 ## Implementation
 ### C
+#### Code
 ```
 void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
     for (size_t i = 3; i < ARRAY_SIZE - 3; i++) {
@@ -20,7 +21,10 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 ```
 This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the array x
 
+#### Screenshot
+
 ### ASM x86-64
+#### Code
 ```
 asm_1D_stencil:
 	mov r10, rcx
@@ -45,7 +49,10 @@ L1:
 ```
 This implementation has the same logic as the c function but at a lower level. The outer loop (L1) iterates through the array, while the inner loop (L2) sums the 7 elements.
 
+#### Screenshot
+
 ### SIMD XMM register
+#### Code
 ```
 xmm_1D_stencil:
 	sub rcx, 0x0000_0000_0000_0003
@@ -75,11 +82,16 @@ xmm_1D_stencil:
 ```
 This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements.
 
+#### Screenshot
+
 ### SIMD YMM register
+#### Code
 ```
 ymm_1D_stencil:
 ```
 This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction operates on 8 packed integers, doubling the parallelism compared to the XMM implementation.
+
+#### Screenshot
 
 ## Table of Execution Time
 ### Debug Mode
@@ -97,4 +109,7 @@ This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction
 | x86-64 Assembly | right bar     | right foo     | right foo     |
 | SIMD XMM | right baz     | right foo     | right foo     |
 | SIMD YMM | right baz     | right foo     | right foo     |
+
+## Conclusion
+yes yes
 
