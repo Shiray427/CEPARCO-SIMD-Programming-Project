@@ -33,6 +33,26 @@ L1:
 	ret
 
 xmm_1D_stencil:
+	sub rcx, 0x0000_0000_0000_0111
+	xor rsi, rsi
+	xmmloop1:
+		movdqu xmm0, [rdx+rsi*4]
+		movdqu xmm1, [rdx+rsi*4+4]
+		movdqu xmm2, [rdx+rsi*4+8]
+		movdqu xmm3, [rdx+rsi*4+12]
+		movdqu xmm4, [rdx+rsi*4+16]
+		movdqu xmm5, [rdx+rsi*4+20]
+		movdqu xmm6, [rdx+rsi*4+24]
+		paddd xmm0, xmm1
+		paddd xmm2, xmm3
+		paddd xmm4, xmm5
+		paddd xmm0, xmm6
+		paddd xmm2, xmm4
+		paddd xmm0, xmm2
+		add rsi, 0x0000_0000_0000_0100
+		sub rcx, 0x0000_0000_0000_0100
+		cmp rcx, 0x0
+		jg xmmloop1
 
 	xor rax, rax
 	ret
