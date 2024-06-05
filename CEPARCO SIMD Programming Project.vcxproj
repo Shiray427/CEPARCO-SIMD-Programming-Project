@@ -22,11 +22,32 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="asmfunc.asm">
+    <CustomBuild Include="asm_1D_stencil.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 asmfunc.asm</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">asmfunc.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 asm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">asm_1D_stencil.obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 asm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">asm_1D_stencil.obj</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="xmm_1D_stencil.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 xmm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">xmm_1D_stencil.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 xmm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">xmm_1D_stencil.obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="ymm_1D_stencil.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 ymm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ymm_1D_stencil.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"C:\Program Files (x86)\SASM\NASM\nasm" -f win64 ymm_1D_stencil.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ymm_1D_stencil.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
   <PropertyGroup Label="Globals">

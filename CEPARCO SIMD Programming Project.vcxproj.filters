@@ -20,7 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="asmfunc.asm">
+    <CustomBuild Include="asm_1D_stencil.asm">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="xmm_1D_stencil.asm">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ymm_1D_stencil.asm">
       <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
