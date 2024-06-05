@@ -36,7 +36,7 @@ void print_text(double time_average, double time_total, size_t loopcount, size_t
 	printf("\n");
 }
 int main() {
-	const size_t ARRAY_SIZE = (1 << 20) ; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 20) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;

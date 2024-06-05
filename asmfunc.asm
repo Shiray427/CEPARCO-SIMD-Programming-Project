@@ -33,7 +33,7 @@ L1:
 	ret
 
 xmm_1D_stencil:
-	sub rcx, 0x0000_0000_0000_0003
+	sub rcx, 0x0000_0000_0000_0004
 	xor rsi, rsi
 	xmmloop1:
 		movdqu xmm0, [rdx+rsi*4]
@@ -50,15 +50,29 @@ xmm_1D_stencil:
 		paddd xmm2, xmm4
 		paddd xmm0, xmm2
 		movdqu [R8+rsi*4], xmm0
-<<<<<<< HEAD
-		add rsi, 0x0000_0000_0000_0004
-		sub rcx, 0x0000_0000_0000_0004
-=======
-		add rsi, 0x0000_0000_0000_0001
-		sub rcx, 0x0000_0000_0000_0001
->>>>>>> 0b968cbc575d80e1f1cfa65465f2276eb87b1c00
+		add rsi, 0x0000_0000_0000_0003
+		sub rcx, 0x0000_0000_0000_0003
 		cmp rcx, 0x0
 		jg xmmloop1
+
+	add ECX, 0x0000_0000_0000_0003
+	mov R11, 7
+
+	xmmloop2:
+		xor RBX,RBX
+		mov R10, R11
+		xmmloop3:
+			xor RAX,RAX
+			mov RAX, [RDX+RSI*4]
+			add RBX,RAX
+			inc rsi
+			dec R10
+			cmp R10, 0x0
+			jg xmmloop3
+		sub RSI, R11
+		mov [R8+RSI*4], RBX
+		inc RSI
+		loop xmmloop2
 
 	xor rax, rax
 	ret
@@ -82,12 +96,12 @@ ymm_1D_stencil:
 		vpaddd ymm11, ymm8, ymm9
 		vpaddd ymm12, ymm10, ymm11
 		vmovdqu [R8+rsi*4], ymm12
-		add rsi, 0x0000_0000_0000_0001
-		sub rcx, 0x0000_0000_0000_0001
+		add rsi, 0x0000_0000_0000_0007
+		sub rcx, 0x0000_0000_0000_0007
 		cmp rcx, 0x0
 		jg ymmloop1
 	
-	add ECX, 0x0000_0000_0000_0008
+	add ECX, 0x0000_0000_0000_0007
 	mov R11, 7
 
 	ymmloop2:
