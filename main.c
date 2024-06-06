@@ -15,16 +15,15 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 		y[i-3] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3]; 
 }
 
-size_t error_counter(size_t ARRAY_SIZE, int32_t* y1, int32_t* y2) {
+size_t error_counter(size_t ARRAY_SIZE, int32_t* in, int32_t* out) {
 	size_t i, count = 0;
-	for (i = 0; i < ARRAY_SIZE; i++)
-		if (y1[i] != y2[i])
+	for (i = 3; i < (ARRAY_SIZE - 3); i++)
+		if (out[i-3] != in[i - 3] + in[i - 2] + in[i - 1] + in[i] + in[i + 1] + in[i + 2] + in[i + 3])
 			count++;
 	return count;
 }
 
-void print_text(double time_average, double time_total, size_t loopcount, size_t Y_ARRAY_SIZE, int32_t out[], char text[]) {
-	time_average = time_total / loopcount;
+void print_text(double time_average, double time_total, size_t Y_ARRAY_SIZE, int32_t* out, char text[]) {
 	printf("Total time taken in %s: %lf ms.\nAverage runtime across 30 %s executions: %lf ms.\n", text, time_total, text, time_average);
 	printf("Output Y: \n");
 	printf("First 10 elements: ");
@@ -36,11 +35,11 @@ void print_text(double time_average, double time_total, size_t loopcount, size_t
 	printf("\n");
 }
 int main() {
-	const size_t ARRAY_SIZE = (1 << 26) + 7; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 30) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
-	int32_t * x, * y_c, * y_asm, * y_xmm, * y_ymm;
+	int32_t * x, * y;
 	double time_taken, time_total, time_average;
 	size_t Y_ARRAY_SIZE = ARRAY_SIZE - 6;
 	size_t Y_ARRAY_BYTES = Y_ARRAY_SIZE * sizeof(int32_t);
@@ -53,38 +52,20 @@ int main() {
 	x = (int32_t*)malloc(ARRAY_BYTES);
 	if (x == NULL)
 		exit(1);
-	y_c = (int32_t*)malloc(Y_ARRAY_BYTES);
-	if (y_c == NULL)
+	y = (int32_t*)malloc(Y_ARRAY_BYTES);
+	if (y == NULL)
 		exit(1);
 
-	y_asm = (int32_t*)malloc(Y_ARRAY_BYTES);
-	if (y_asm == NULL)
-		exit(1);
-
-	y_xmm = (int32_t*)malloc(Y_ARRAY_BYTES); 
-	if (y_xmm == NULL) 
-		exit(1);
-
-	y_ymm = (int32_t*)malloc(Y_ARRAY_BYTES); 
-	if (y_ymm == NULL) 
-		exit(1);
-	
 	time_t t;
 	srand((unsigned int)time(&t));
 	for (i = 0; i < ARRAY_SIZE; i++)
-		x[i] = (int32_t)rand() % 16;
-	
-	for (i = 0; i < Y_ARRAY_SIZE; i++) {
-		y_c[i] = 0;
-		y_asm[i] = 0;
-		y_xmm[i] = 0;
-		y_ymm[i] = 0;
-	}		
+		x[i] = (int32_t)rand();
 
-
-	//C function 
+	//C function
+	for (i = 0; i < Y_ARRAY_SIZE; i++)
+		y[i] = 0;
 	QueryPerformanceCounter(&start);
-	c_1D_stencil(ARRAY_SIZE, x, y_c); //call function
+	c_1D_stencil(ARRAY_SIZE, x, y); //call function
 	QueryPerformanceCounter(&end);
 	time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 	printf("First run initialization. Time in C: %lf ms\n", time_taken);
@@ -92,19 +73,21 @@ int main() {
 	time_total = 0.0;
 	for (i = 0; i < loopcount; i++) {
 		QueryPerformanceCounter(&start);
-		c_1D_stencil(ARRAY_SIZE, x, y_c); //call function
+		c_1D_stencil(ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 		printf("Run #%d. Time in C: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "C");
+	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "C");
 	
-	/*
+	
 	//x86-64 ASM function
+	for (i = 0; i < Y_ARRAY_SIZE; i++)
+		y[i] = 0;
 	QueryPerformanceCounter(&start);
-	asm_1D_stencil(Y_ARRAY_SIZE, x, y_asm); //call function
+	asm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 	QueryPerformanceCounter(&end);
 	time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 	printf("First run initialization. Time in x86-64 ASM: %lf ms\n", time_taken);
@@ -112,23 +95,25 @@ int main() {
 	time_total = 0.0;
 	for (i = 0; i < loopcount; i++) {
 		QueryPerformanceCounter(&start);
-		asm_1D_stencil(Y_ARRAY_SIZE, x, y_asm); //call function 
+		asm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function 
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 		printf("Run #%d. Time in x86-64 ASM: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_asm, "x86-64 ASM");
-	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_asm);
+	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86-64 ASM");
+	error_count = error_counter(Y_ARRAY_SIZE, x, y);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
-	*/
+	
 	
 
 	
 	//x86 SIMD AVX2 ASM function using XMM register
+	for (i = 0; i < Y_ARRAY_SIZE; i++)
+		y[i] = 0;
 	QueryPerformanceCounter(&start);
-	xmm_1D_stencil(Y_ARRAY_SIZE, x, y_xmm); //call function
+	xmm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 	QueryPerformanceCounter(&end);
 	time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 	printf("First run initialization. Time in x86 SIMD AVX2 using XMM register: %lf ms\n", time_taken);
@@ -136,22 +121,24 @@ int main() {
 	time_total = 0.0;
 	for (i = 0; i < loopcount; i++) {
 		QueryPerformanceCounter(&start);
-		xmm_1D_stencil(Y_ARRAY_SIZE, x, y_xmm); //call function
+		xmm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 		printf("Run #%d. Time in x86 SIMD AVX2 using XMM register: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "x86 SIMD AVX2 using XMM register");
-	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_xmm);
+	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86 SIMD AVX2 using XMM register");
+	error_count = error_counter(Y_ARRAY_SIZE, x, y);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
 	
 
 	//x86 SIMD AVX2 ASM function using YMM register
+	for (i = 0; i < Y_ARRAY_SIZE; i++)
+		y[i] = 0;
 	QueryPerformanceCounter(&start);
-	ymm_1D_stencil(Y_ARRAY_SIZE, x, y_ymm); //call function
+	ymm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 	QueryPerformanceCounter(&end);
 	time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 	printf("First run initialization. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", time_taken);
@@ -159,21 +146,18 @@ int main() {
 	time_total = 0.0;
 	for (i = 0; i < loopcount; i++) {
 		QueryPerformanceCounter(&start);
-		ymm_1D_stencil(Y_ARRAY_SIZE, x, y_ymm); //call function
+		ymm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
-		time_taken = (double)((double)(end.QuadPart - start.QuadPart) * (double)1e6 /(double) freq.QuadPart);
+		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
 		printf("Run #%d. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
-	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "x86 SIMD AVX2 using YMM register");
-	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_ymm);
+	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86 SIMD AVX2 using YMM register");
+	error_count = error_counter(Y_ARRAY_SIZE, x, y);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
 	free(x);
-	free(y_c);
-	free(y_asm);
-	free(y_xmm);
-	free(y_ymm);
+	free(y);
 	return 0;
 }

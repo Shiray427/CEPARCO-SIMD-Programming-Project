@@ -12,6 +12,8 @@ xmm_1D_stencil:
 	push rbx
 	push rsi
 	push rdi
+	sub rsp,0x10
+	movdqu [rsp],xmm6
 
 	sub rcx, 0x0000_0000_0000_0004
 	xor rsi, rsi
@@ -54,6 +56,9 @@ xmm_1D_stencil:
 		inc RSI
 		loop xmmloop2
 
+
+	movdqu xmm6,[rsp]
+	add rsp,0x10
 	pop rdi
 	pop rsi
 	pop rbx

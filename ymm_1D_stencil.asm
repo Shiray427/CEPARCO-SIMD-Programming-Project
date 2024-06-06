@@ -12,6 +12,20 @@ ymm_1D_stencil:
 	push rbx
 	push rsi
 	push rdi
+	sub rsp,0x20
+	vmovdqu [rsp],ymm6
+	sub rsp,0x20
+	vmovdqu [rsp],ymm7
+	sub rsp,0x20
+	vmovdqu [rsp],ymm8
+	sub rsp,0x20
+	vmovdqu [rsp],ymm9
+	sub rsp,0x20
+	vmovdqu [rsp],ymm10
+	sub rsp,0x20
+	vmovdqu [rsp],ymm11
+	sub rsp,0x20
+	vmovdqu [rsp],ymm12
 
 	sub rcx, 0x0000_0000_0000_0008
 	xor rsi, rsi
@@ -26,9 +40,9 @@ ymm_1D_stencil:
 		vpaddd ymm7, ymm0, ymm1
 		vpaddd ymm8, ymm2, ymm3
 		vpaddd ymm9, ymm4,ymm5
-		vpaddd ymm10, ymm7, ymm6
+		vpaddd ymm13, ymm7, ymm6
 		vpaddd ymm11, ymm8, ymm9
-		vpaddd ymm12, ymm10, ymm11
+		vpaddd ymm12, ymm13, ymm11
 		vmovdqu [R8+rsi*4], ymm12
 		add rsi, 0x0000_0000_0000_0007
 		sub rcx, 0x0000_0000_0000_0007
@@ -55,6 +69,20 @@ ymm_1D_stencil:
 		loop ymmloop2
 
 
+	vmovdqu ymm12,[rsp]
+	add rsp,0x20
+	vmovdqu ymm11,[rsp]
+	add rsp,0x20
+	vmovdqu ymm10,[rsp]
+	add rsp,0x20
+	vmovdqu ymm9,[rsp]
+	add rsp,0x20
+	vmovdqu ymm8,[rsp]
+	add rsp,0x20
+	vmovdqu ymm7,[rsp]
+	add rsp,0x20
+	vmovdqu ymm6,[rsp]
+	add rsp,0x20
 	pop rdi
 	pop rsi
 	pop rbx
