@@ -36,7 +36,7 @@ void print_text(double time_average, double time_total, size_t loopcount, size_t
 	printf("\n");
 }
 int main() {
-	const size_t ARRAY_SIZE = (1 << 28) + 7; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 26) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -161,7 +161,7 @@ int main() {
 		QueryPerformanceCounter(&start);
 		ymm_1D_stencil(Y_ARRAY_SIZE, x, y_ymm); //call function
 		QueryPerformanceCounter(&end);
-		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
+		time_taken = (double)((double)(end.QuadPart - start.QuadPart) * (double)1e6 /(double) freq.QuadPart);
 		printf("Run #%d. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
