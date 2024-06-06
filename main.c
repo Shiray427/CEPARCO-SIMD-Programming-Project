@@ -12,15 +12,15 @@ extern void ymm_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y);
 void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 	size_t i;
 	for (i = 3; i < (ARRAY_SIZE - 3); i++)
-		y[i-3] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3]; 
+		y[i - 3] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3]; 
 }
 
-size_t error_counter(size_t ARRAY_SIZE, int32_t* in, int32_t* out) {
+void error_counter(size_t ARRAY_SIZE, int32_t* in, int32_t* out) {
 	size_t i, count = 0;
 	for (i = 3; i < (ARRAY_SIZE - 3); i++)
-		if (out[i-3] != in[i - 3] + in[i - 2] + in[i - 1] + in[i] + in[i + 1] + in[i + 2] + in[i + 3])
+		if (out[i - 3] != in[i - 3] + in[i - 2] + in[i - 1] + in[i] + in[i + 1] + in[i + 2] + in[i + 3])
 			count++;
-	return count;
+	printf("Output value comparison with C output vector error count: %zd\n", count);
 }
 
 void print_text(double time_average, double time_total, size_t Y_ARRAY_SIZE, int32_t* out, char text[]) {
@@ -36,17 +36,15 @@ void print_text(double time_average, double time_total, size_t Y_ARRAY_SIZE, int
 }
 
 int main() {
-	const size_t ARRAY_SIZE = (1 << 30) + 7; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 20) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
+	const size_t Y_ARRAY_SIZE = ARRAY_SIZE - 6;
+	const size_t Y_ARRAY_BYTES = Y_ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
-	int i;
+	size_t i, error_count;
 	int32_t * x, * y;
 	double time_taken, time_total, time_average;
-	size_t Y_ARRAY_SIZE = ARRAY_SIZE - 6;
-	size_t Y_ARRAY_BYTES = Y_ARRAY_SIZE * sizeof(int32_t);
-	size_t error_count;
-	LARGE_INTEGER start, end;
-	LARGE_INTEGER freq;
+	LARGE_INTEGER start, end, freq;
 	QueryPerformanceFrequency(&freq);
 
 	printf("Number of elements = %zd\n", ARRAY_SIZE);
@@ -77,7 +75,7 @@ int main() {
 		c_1D_stencil(ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
-		printf("Run #%d. Time in C: %lf ms\n", i+1, time_taken);
+		printf("Run #%zd. Time in C: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
@@ -100,13 +98,12 @@ int main() {
 		asm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function 
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
-		printf("Run #%d. Time in x86-64 ASM: %lf ms\n", i+1, time_taken);
+		printf("Run #%zd. Time in x86-64 ASM: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
 	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86-64 ASM");
-	error_count = error_counter(Y_ARRAY_SIZE, x, y);
-	printf("Output value comparison with C output vector error count: %zd\n", error_count);
+	error_counter(Y_ARRAY_SIZE, x, y);
 	
 	
 	
@@ -125,13 +122,12 @@ int main() {
 		xmm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
-		printf("Run #%d. Time in x86 SIMD AVX2 using XMM register: %lf ms\n", i+1, time_taken);
+		printf("Run #%zd. Time in x86 SIMD AVX2 using XMM register: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
 	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86 SIMD AVX2 using XMM register");
-	error_count = error_counter(Y_ARRAY_SIZE, x, y);
-	printf("Output value comparison with C output vector error count: %zd\n", error_count);
+	error_counter(Y_ARRAY_SIZE, x, y);
 	
 	
 
@@ -150,13 +146,12 @@ int main() {
 		ymm_1D_stencil(Y_ARRAY_SIZE, x, y); //call function
 		QueryPerformanceCounter(&end);
 		time_taken = (double)(end.QuadPart - start.QuadPart) * 1e3 / freq.QuadPart;
-		printf("Run #%d. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", i+1, time_taken);
+		printf("Run #%zd. Time in x86 SIMD AVX2 using YMM register: %lf ms\n", i+1, time_taken);
 		time_total += time_taken;
 	}
 	time_average = time_total / loopcount;
 	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "x86 SIMD AVX2 using YMM register");
-	error_count = error_counter(Y_ARRAY_SIZE, x, y);
-	printf("Output value comparison with C output vector error count: %zd\n", error_count);
+	error_counter(Y_ARRAY_SIZE, x, y);
 	
 	free(x);
 	free(y);
