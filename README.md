@@ -26,19 +26,19 @@ This implementation serves as the baseline for comparison. It gets the sum of th
 
 #### Screenshot
 ##### C Output at 2^20 (Debug)
-![C_Output_20](C_Output_20.png)
+![C_Output_20](Screenshots/C_Output_20.png)
 ##### C Output at 2^20 (Release)
-![C_Output_20_rel](C_Output_20_rel.png)
+![C_Output_20_rel](Screenshots/C_Output_20_rel.png)
 ##### C Output at 2^26 (Debug)
-![C_Output_26](C_Output_26.png)
+![C_Output_26](Screenshots/C_Output_26.png)
 ##### C Output at 2^26 (Release)
-![C_Output_26_rel](C_Output_26_rel.png)
+![C_Output_26_rel](Screenshots/C_Output_26_rel.png)
 ##### C Output at 2^30 (Debug)
-![C_Output_30](C_Output_30.png)
-##### C Output at 2^20 (Release)
-![C_Output_30_rel](C_Output_30_rel.png)
+![C_Output_30](Screenshots/C_Output_30.png)
+##### C Output at 2^30 (Release)
+![C_Output_30_rel](Screenshots/C_Output_30_rel.png)
 
-### ASM x86-64
+### x86-64 ASM
 #### Code
 ```
 asm_1D_stencil:
@@ -62,11 +62,23 @@ L1:
 	xor rax, rax
 	ret
 ```
-This implementation has the same logic as the c function but at a lower level. The outer loop (L1) iterates through the array, while the inner loop (L2) sums the 7 elements.
+This implementation utilized a nested loop to achieve the stencil operation. the inner loop accumulated the value of the current value being calculated, and the 7 consecutive values are iterated through and added to an accumulator, after which the value is stored to the array. The pointers of the input and output vectors are adjusted accordingly between iterations to ensure that the correct values from the input vector are being accumulated and that the resulting sums are stored in the correct location in the output vector.
 
 #### Screenshot
+##### x86-64 ASM Output at 2^20 (Debug)
+![ASM_Output_20](Screenshots/ASM_Output_20.png)
+##### x86-64 ASM Output at 2^20 (Release)
+![ASM_Output_20_rel](Screenshots/ASM_Output_20_rel.png)
+##### x86-64 ASM Output at 2^26 (Debug)
+![ASM_Output_26](Screenshots/ASM_Output_26.png)
+##### x86-64 ASM Output at 2^26 (Release)
+![ASM_Output_26_rel](Screenshots/ASM_Output_26_rel.png)
+##### x86-64 ASM Output at 2^30 (Debug)
+![ASM_Output_30](Screenshots/ASM_Output_30.png)
+##### x86-64 ASM Output at 2^20 (Release)
+![ASM_Output_30_rel](Screenshots/ASM_Output_30_rel.png)
 
-### SIMD XMM register
+### x86 SIMD AVX2 ASM using XMM
 #### Code
 ```
 xmm_1D_stencil:
@@ -129,8 +141,20 @@ xmm_1D_stencil:
 This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements.
 
 #### Screenshot
+##### x86 SIMD AVX2 using XMM Output at 2^20 (Debug)
+![XMM_Output_20](Screenshots/XMM_Output_20.png)
+##### x86 SIMD AVX2 using XMM Output at 2^20 (Release)
+![XMM_Output_20_rel](Screenshots/XMM_Output_20_rel.png)
+##### x86 SIMD AVX2 using XMM Output at 2^26 (Debug)
+![XMM_Output_26](Screenshots/XMM_Output_26.png)
+##### x86 SIMD AVX2 using XMM Output at 2^26 (Release)
+![XMM_Output_26_rel](Screenshots/XMM_Output_26_rel.png)
+##### x86 SIMD AVX2 using XMM Output at 2^30 (Debug)
+![XMM_Output_30](Screenshots/XMM_Output_30.png)
+##### x86 SIMD AVX2 using XMM Output at 2^20 (Release)
+![XMM_Output_30_rel](Screenshots/XMM_Output_30_rel.png)
 
-### SIMD YMM register
+### x86 SIMD AVX2 ASM using YMM
 #### Code
 ```
 ymm_1D_stencil:
@@ -218,6 +242,18 @@ ymm_1D_stencil:
 This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction operates on 8 packed integers, doubling the parallelism compared to the XMM implementation.
 
 #### Screenshot
+##### x86 SIMD AVX2 using YMM Output at 2^20 (Debug)
+![YMM_Output_20](Screenshots/YMM_Output_20.png)
+##### x86 SIMD AVX2 using YMM Output at 2^20 (Release)
+![YMM_Output_20_rel](Screenshots/YMM_Output_20_rel.png)
+##### x86 SIMD AVX2 using YMM Output at 2^26 (Debug)
+![YMM_Output_26](Screenshots/YMM_Output_26.png)
+##### x86 SIMD AVX2 using YMM Output at 2^26 (Release)
+![YMM_Output_26_rel](Screenshots/YMM_Output_26_rel.png)
+##### x86 SIMD AVX2 using YMM Output at 2^30 (Debug)
+![YMM_Output_30](Screenshots/YMM_Output_30.png)
+##### x86 SIMD AVX2 using YMM Output at 2^20 (Release)
+![YMM_Output_30_rel](Screenshots/YMM_Output_30_rel.png)
 
 ## Table of Execution Time
 Execution times for each implementation are measured in both DEBUG and RELEASE mode. The kernel is ran 30 times to calculate the average runtime. Below is the table of average runtime of each implementation.
@@ -225,19 +261,19 @@ Execution times for each implementation are measured in both DEBUG and RELEASE m
 ### Debug Mode
 |   | 2^20 | 2^26 | 2^30 |
 | ------------- |-------------|------------- |------------- |
-| C Implementation | right foo     | right foo     | right foo     |
-| x86-64 Assembly | right bar     | right foo     | right foo     |
-| SIMD XMM | right baz     | right foo     | right foo     |
-| SIMD YMM | right baz     | right foo     | right foo     |
+| C | 2.299107 ms | 140.978020 ms | 2257.447447 ms |
+| x86-64 ASM | 8.670397 ms | 541.459027 ms | 8749.174177 ms |
+| x86 SIMD AVX2 ASM using XMM | 0.314783 ms | 29.459390 ms | 482.012747 ms |
+| x86 SIMD AVX2 ASM using YMM | 0.250223 ms | 28.706993 ms | 472.057233 ms |
 
 ### Release Mode
 |   | 2^20 | 2^26 | 2^30 |
 | ------------- |-------------|------------- |------------- |
-| C Implementation | right foo     | right foo     | right foo     |
-| x86-64 Assembly | right bar     | right foo     | right foo     |
-| SIMD XMM | right baz     | right foo     | right foo     |
-| SIMD YMM | right baz     | right foo     | right foo     |
+| C | 0.381130 ms | 30.060877 ms | 478.531403 ms |
+| x86-64 ASM | 8.790763 ms | 545.266213 ms | 8722.438213 ms |
+| x86 SIMD AVX2 ASM using XMM | 0.334360 ms | 30.458090 ms | 477.479007 ms |
+| x86 SIMD AVX2 ASM using YMM | 0.270087 ms | 28.226107 ms | 465.343303 ms |
 
-## Conclusion
+## Performance Analysis
 no no 
 
