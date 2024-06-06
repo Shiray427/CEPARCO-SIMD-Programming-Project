@@ -2,14 +2,14 @@
 #### AMBROSIO, ARCETA, MENDOZA, TAN
 **Input**: Memory location n (integer) contains the length of the vector; Vectors X and Y are both **32-bit integer**. 
 
-**Process**: Y[i] = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
+**Process**: Y[i] = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2]  + X[i + 3] 
 
 **Output**: store result in vector Y. Also, display the result of first ten elements and last 10 elements of vector Y for all versions of kernels.
 
 *Example: X-> 1.2.3.4.5.6.7.8: output: Y-> 28.35*
 
 ## Implementation
-This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the x86-64 assembly and SIMD AVX2 implementations are compared with a C computed result to confirm the correctness, and the last and first 10 elements of the output vectors are printed for verification.
+This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the x86-64 assembly and SIMD AVX2 implementations are compared with a C computed result to confirm the correctness, and the last and first 10 elements of the output vectors are printed for verification. The kernel implementations are tested with vector sizes 2^20, 2^26, and 2^30, however to account for boundary situations, all runs are instead tested with vector sizes 2^20 + 7, 2^26 + 7, and 2^30 + 7, since for the given data type, the XMM and YMM registers can hold 4 and 8 values respectively, thus using 7 as a boundary condition properly checks both cases. The input vector is randomized using the C standard library rand() function.
 
 
 ### C
@@ -24,7 +24,7 @@ void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
 ```
 This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the x vector. The y vector indexing is offset by 3 on both sides to account for the fact that the stencil outputs exactly 6 elements less than the input vector due to the window size. Thus this enables exact output size and no empty elements in the vector.
 
-#### Screenshot
+#### Screenshots
 ##### C Output at 2^20 (Debug)
 ![C_Output_20](Screenshots/C_Output_20.png)
 ##### C Output at 2^20 (Release)
@@ -64,7 +64,7 @@ L1:
 ```
 This implementation utilized a nested loop to achieve the stencil operation. the inner loop accumulated the value of the current value being calculated, and the 7 consecutive values are iterated through and added to an accumulator, after which the value is stored to the array. The pointers of the input and output vectors are adjusted accordingly between iterations to ensure that the correct values from the input vector are being accumulated and that the resulting sums are stored in the correct location in the output vector.
 
-#### Screenshot
+#### Screenshots
 ##### x86-64 ASM Output at 2^20 (Debug)
 ![ASM_Output_20](Screenshots/ASM_Output_20.png)
 ##### x86-64 ASM Output at 2^20 (Release)
@@ -138,9 +138,14 @@ xmm_1D_stencil:
 	xor rax, rax
 	ret
 ```
+
+//INSERT ACTUAL IN DEPTH DISCUSSION
+-> mention register push pop, probably talk about +3 vs +4 problem? boundary handling (mention as a single run of the serial implementation etc.)
+
+
 This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements.
 
-#### Screenshot
+#### Screenshots
 ##### x86 SIMD AVX2 using XMM Output at 2^20 (Debug)
 ![XMM_Output_20](Screenshots/XMM_Output_20.png)
 ##### x86 SIMD AVX2 using XMM Output at 2^20 (Release)
@@ -239,9 +244,13 @@ ymm_1D_stencil:
 	xor rax, rax
 	ret
 ```
+
+//INSERT ACTUAL IN DEPTH DISCUSSION
+-> mention register push pop, probably talk about +7 vs +8 problem, boundary handling (mention as a single run of the serial implementation etc.)
+
 This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction operates on 8 packed integers, doubling the parallelism compared to the XMM implementation.
 
-#### Screenshot
+#### Screenshots
 ##### x86 SIMD AVX2 using YMM Output at 2^20 (Debug)
 ![YMM_Output_20](Screenshots/YMM_Output_20.png)
 ##### x86 SIMD AVX2 using YMM Output at 2^20 (Release)
@@ -256,18 +265,18 @@ This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction
 ![YMM_Output_30_rel](Screenshots/YMM_Output_30_rel.png)
 
 ## Table of Execution Time
-Execution times for each implementation are measured in both DEBUG and RELEASE mode. The kernel is ran 30 times to calculate the average runtime. Below is the table of average runtime of each implementation.
+Execution times for each implementation are measured in both DEBUG and RELEASE mode. The kernel is ran 30 times and the average runtime is calculated. A single run is also executed as a buffer to eliminate the first run performance outlier. Below are the tables of average runtime of each implementation in Debug and Release modes.
 
-### Debug Mode
-|   | 2^20 | 2^26 | 2^30 |
+
+| _**Debug Mode**_ | 2^20 | 2^26 | 2^30 |
 | ------------- |-------------|------------- |------------- |
 | C | 2.299107 ms | 140.978020 ms | 2257.447447 ms |
 | x86-64 ASM | 8.670397 ms | 541.459027 ms | 8749.174177 ms |
 | x86 SIMD AVX2 ASM using XMM | 0.314783 ms | 29.459390 ms | 482.012747 ms |
 | x86 SIMD AVX2 ASM using YMM | 0.250223 ms | 28.706993 ms | 472.057233 ms |
 
-### Release Mode
-|   | 2^20 | 2^26 | 2^30 |
+
+| _**Release Mode**_ | 2^20 | 2^26 | 2^30 |
 | ------------- |-------------|------------- |------------- |
 | C | 0.381130 ms | 30.060877 ms | 478.531403 ms |
 | x86-64 ASM | 8.790763 ms | 545.266213 ms | 8722.438213 ms |
@@ -275,5 +284,10 @@ Execution times for each implementation are measured in both DEBUG and RELEASE m
 | x86 SIMD AVX2 ASM using YMM | 0.270087 ms | 28.226107 ms | 465.343303 ms |
 
 ## Performance Analysis
-no no 
+// MOST IMPORTANT PART
+-> analyze performance of different kernels, how many times faster, why is it faster, etc.
+As can be seen from the tables above, ....
 
+## Additional Discussion
+//Also relatively important, can be just a general info dump of anything learned in the project process (looking at u anton)
+-> any problems and consequent solutions, unique methods used, AHA moments (importance of non-volatile register value saving to the stack in release mode)
