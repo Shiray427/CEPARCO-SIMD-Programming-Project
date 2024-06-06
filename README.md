@@ -26,7 +26,7 @@ This implementation serves as the baseline for comparison. It gets the sum of th
 
 #### Screenshot
 ##### C Output at 2^20 (Debug)
-![C_Output_20](Screenshots/C_Output_20.png)
+![C_Output_20](C_Output_20.png)
 ##### C Output at 2^20 (Release)
 ![C_Output_20_rel](C_Output_20_rel.png)
 ##### C Output at 2^26 (Debug)
