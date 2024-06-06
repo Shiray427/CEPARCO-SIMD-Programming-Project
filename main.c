@@ -34,6 +34,7 @@ void print_text(double time_average, double time_total, size_t Y_ARRAY_SIZE, int
 		printf("%d ", out[j]);
 	printf("\n");
 }
+
 int main() {
 	const size_t ARRAY_SIZE = (1 << 30) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
@@ -82,6 +83,7 @@ int main() {
 	time_average = time_total / loopcount;
 	print_text(time_average, time_total, Y_ARRAY_SIZE, y, "C");
 	
+
 	
 	//x86-64 ASM function
 	for (i = 0; i < Y_ARRAY_SIZE; i++)
@@ -107,7 +109,6 @@ int main() {
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
 	
 	
-
 	
 	//x86 SIMD AVX2 ASM function using XMM register
 	for (i = 0; i < Y_ARRAY_SIZE; i++)
