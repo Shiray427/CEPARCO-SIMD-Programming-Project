@@ -36,7 +36,7 @@ void print_text(double time_average, double time_total, size_t loopcount, size_t
 	printf("\n");
 }
 int main() {
-	const size_t ARRAY_SIZE = (1 << 26) + 7; //modify to large values (1 << 20, 26, 30)
+	const size_t ARRAY_SIZE = (1 << 28) + 7; //modify to large values (1 << 20, 26, 30)
 	const size_t ARRAY_BYTES = ARRAY_SIZE * sizeof(int32_t);
 	const size_t loopcount = 30;
 	int i;
@@ -101,7 +101,7 @@ int main() {
 	time_average = time_total / loopcount;
 	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_c, "C");
 	
-	
+	/*
 	//x86-64 ASM function
 	QueryPerformanceCounter(&start);
 	asm_1D_stencil(Y_ARRAY_SIZE, x, y_asm); //call function
@@ -122,7 +122,7 @@ int main() {
 	print_text(time_average, time_total, loopcount, Y_ARRAY_SIZE, y_asm, "x86-64 ASM");
 	error_count = error_counter(Y_ARRAY_SIZE, y_c, y_asm);
 	printf("Output value comparison with C output vector error count: %zd\n", error_count);
-
+	*/
 	
 
 	

@@ -9,6 +9,10 @@ global xmm_1D_stencil
 ; R8 - Address of output vector y -> [r8] is value of y
 
 xmm_1D_stencil:
+	push rbx
+	push rsi
+	push rdi
+
 	sub rcx, 0x0000_0000_0000_0004
 	xor rsi, rsi
 	xmmloop1:
@@ -50,5 +54,8 @@ xmm_1D_stencil:
 		inc RSI
 		loop xmmloop2
 
+	pop rdi
+	pop rsi
+	pop rbx
 	xor rax, rax
 	ret
