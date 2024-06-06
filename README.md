@@ -2,7 +2,7 @@
 #### AMBROSIO, ARCETA, MENDOZA, TAN
 **Input**: Memory location n (integer) contains the length of the vector; Vectors X and Y are both 32-bit integer. 
 
-**Process**: Y = X[i - 3] + X[i — 2] + X[i — 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
+**Process**: Y = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
 
 **Output**: store result in vector Y. Also, display the result of first ten elements and last 10 elements of vector Y for all versions of kernels.
 
