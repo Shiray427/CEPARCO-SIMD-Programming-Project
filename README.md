@@ -1,27 +1,42 @@
 # CEPARCO SIMD Programming Project
 #### AMBROSIO, ARCETA, MENDOZA, TAN
-**Input**: Memory location n (integer) contains the length of the vector; Vectors X and Y are both 32-bit integer. 
+**Input**: Memory location n (integer) contains the length of the vector; Vectors X and Y are both **32-bit integer**. 
 
-**Process**: Y = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
+**Process**: Y[i] = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2]  + X[i +3] 
 
 **Output**: store result in vector Y. Also, display the result of first ten elements and last 10 elements of vector Y for all versions of kernels.
 
 *Example: X-> 1.2.3.4.5.6.7.8: output: Y-> 28.35*
 
 ## Implementation
-This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the assembly and SIMD implementations are compared with the C version to confirm the correctness, and the last and first 10 elements of the output vectors are presented for verification.
+This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the x86-64 assembly and SIMD AVX2 implementations are compared with a C computed result to confirm the correctness, and the last and first 10 elements of the output vectors are printed for verification.
+
+
 ### C
 #### Code
 ```
 void c_1D_stencil(size_t ARRAY_SIZE, int32_t* x, int32_t* y) {
-    for (size_t i = 3; i < ARRAY_SIZE - 3; i++) {
+    size_t i;
+    for (i = 3; i < ARRAY_SIZE - 3; i++) {
         y[i - 3] = x[i - 3] + x[i - 2] + x[i - 1] + x[i] + x[i + 1] + x[i + 2] + x[i + 3];
     }
 }
 ```
-This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the array x.
+This implementation serves as the baseline for comparison. It gets the sum of the 7-element window centered at each element of the x vector. The y vector indexing is offset by 3 on both sides to account for the fact that the stencil outputs exactly 6 elements less than the input vector due to the window size. Thus this enables exact output size and no empty elements in the vector.
 
 #### Screenshot
+##### C Output at 2^20 (Debug)
+![C_Output_20](Screenshots/C_Output_20.png)
+##### C Output at 2^20 (Release)
+![C_Output_20_rel](C_Output_20_rel.png)
+##### C Output at 2^26 (Debug)
+![C_Output_26](C_Output_26.png)
+##### C Output at 2^26 (Release)
+![C_Output_26_rel](C_Output_26_rel.png)
+##### C Output at 2^30 (Debug)
+![C_Output_30](C_Output_30.png)
+##### C Output at 2^20 (Release)
+![C_Output_30_rel](C_Output_30_rel.png)
 
 ### ASM x86-64
 #### Code
