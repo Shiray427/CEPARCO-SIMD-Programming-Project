@@ -288,6 +288,10 @@ Execution times for each implementation are measured in both DEBUG and RELEASE m
 -> analyze performance of different kernels, how many times faster, why is it faster, etc.
 As can be seen from the tables above, ....
 
+As seen in the table above, the C implementation is the 2nd slowest among all implementations in debug mode, mainly due to the lack of low-level optimizations. The performance significantly improves in release mode by 78%-58% but remains slower compared to the SIMD implementations.  On the other hand, the ASM implementation is the slowest among the 4 implementations. The lack of parallelism and higher instruction overhead contribute to this inefficiency. Similar to the C implementation, the release mode offers some performance improvement but is still not competitive with the SIMD implementations. The SIMD AVX2 XMM implementation significantly outperforms the C and assembly implementations. Meanwhile, SIMD AVX2 YMM implementation is the fastest in debug mode. By utilizing 256-bit registers, 8 integers are to be processed simultaneously, doubling the parallelism compared to XMM. In both SIMD implementations, the release mode does little to no optimization.
+
+Overall, **the SIMD AVX2 with YMM implementation is the fastest and most efficient among the 4 implementation**. It takes full advantage of AVX2 instructions and 256-bit registers to improve performance significantly over C and x86-64 assembly versions. The results clearly show the effectiveness of SIMD parallelism in optimizing computationally expensive operations. 
+
 ## Additional Discussion
 //Also relatively important, can be just a general info dump of anything learned in the project process (looking at u anton)
 -> any problems and consequent solutions, unique methods used, AHA moments (importance of non-volatile register value saving to the stack in release mode)
