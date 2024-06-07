@@ -143,7 +143,7 @@ xmm_1D_stencil:
 -> mention register push pop, probably talk about +3 vs +4 problem? boundary handling (mention as a single run of the serial implementation etc.)
 
 
-This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements.
+This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements. 7 registers are used to get the seven input elements required for the stencil operation. Although theoretically, it'll work on 4 integers at a time, due to the possibility of a violationError, in which the program accesses memory that has not been allocated, it was changed such that it will only work on 3 integers at a time, this makes it slightly more inefficient than ideal. Another obstacle was that due to making it such that it only works on 3 integers at a time, there were always some elements that do not get solved for. To rectify this, we used the serial asm x86-64 implementation to solve for the last couple elements, this is slightly inefficient but also ensures that no violationError occurs. As an example of the violationError, if we were on the last loop with only 3 elements left, the last packed integer of the last register would be the 16 bytes after the end of the allocated memory for the input array.
 
 #### Screenshots
 ##### x86 SIMD AVX2 using XMM Output at 2^20 (Debug)
