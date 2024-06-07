@@ -11,6 +11,13 @@
 ## Implementation
 This project involves implementing the 1D stencil kernel in C, x86-64 assembly, and SIMD AVX2 with XMM and YMM registers. Outputs from the x86-64 assembly and SIMD AVX2 implementations are compared with a C computed result to confirm the correctness, and the last and first 10 elements of the output vectors are printed for verification. The kernel implementations are tested with vector sizes 2^20, 2^26, and 2^30, however to account for boundary situations, all runs are instead tested with vector sizes 2^20 + 7, 2^26 + 7, and 2^30 + 7, since for the given data type, the XMM and YMM registers can hold 4 and 8 values respectively, thus using 7 as a boundary condition properly checks both cases. The input vector is randomized using the C standard library rand() function.
 
+```
+time_t t;
+srand((unsigned int)time(&t));
+for (i = 0; i < ARRAY_SIZE; i++)
+	x[i] = (int32_t)rand();
+```
+Randomness was implemented using the above code snippet to provide the x input vector with random values.
 
 ### C
 #### Code
@@ -284,7 +291,7 @@ Regardless, we can generally say that YMM AVX2 ASM implementation is able to per
 
 The easiest to take a look at would be the x86-64 ASM implementation and understand why it performed significantly worse than the rest. The serial implementation in this project as mentioned above utilized a nested loop to compute the stencil values. While the stencil window is only of size 7, a complexity of O(7n) is still expected to be bigger than a single loop implementation such as the C (and even the AVX2 implementations, who themselves have further optimizations). While not equivalent due to the differences in c calls, this provides some insight which is reflected in the execution times observed.
 
-Both the AVX2 implementations utilize the SIMD paradigm to accelerate the executions by operating on more than one value; in this case 4 and 8 respectively. Due to the violationError considerations made, the implementations in practice operate on 3 and 7 new unique values instead. while this gives the impression that there is an over 2.33x hypothetical performance gain, our results show otherwise, leading us to speculate how an implementation that operates 3 new values per iteration can perform close to an implementation that operates 7 new values. 
+Both the AVX2 implementations utilize the SIMD paradigm to accelerate the executions by operating on more than one value; in this case 4 and 8 respectively. Due to the violationError considerations made, the implementations in practice operate on 3 and 7 new unique values instead. while this gives the impression that there is an over 2.33x hypothetical performance gain, our results show otherwise, leading us to speculate how an implementation that operates 3 new values per iteration can perform close to an implementation that operates 7 new values. In terms of implementation, it can be speculated that since the V instructions (VPADDD vs PADDD, etc.) interacts with 3 registers compared to 2, among other reasons, results in each instruction to execute slower. Some other external bottlenecks may be the following: cache memory, differing CPU microarchitectures (the XMMM vs YMM gap varied between systems tested).
 
 The improvement of C when optimized in Release Mode vs when unoptimized in Debug Mode is also interesting to see, as the compiler is able to use optimizations invisible to the user which allows the code to compete with SIMD AVX2 implementations in performance.
 
