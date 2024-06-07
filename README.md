@@ -139,10 +139,6 @@ xmm_1D_stencil:
 	ret
 ```
 
-//INSERT ACTUAL IN DEPTH DISCUSSION
--> mention register push pop, probably talk about +3 vs +4 problem? boundary handling (mention as a single run of the serial implementation etc.)
-
-
 This implementation uses XMM registers to perform SIMD operations and utilizes the paddd instruction, which operates on 4 packed integers, allowing for parallel processing of 4 elements. 7 registers are used to get the seven input elements required for the stencil operation. Push and pop are used to preserve the values of the non-volatile registers such as xmm6, rbx, rsi, rsp, and rdi used in this code. It will prevent unexpected values and behavior that can cause an issue to the program. Although theoretically, it'll work on 4 integers at a time, due to the possibility of a violationError, in which the program accesses memory that has not been allocated, it was changed such that it will only work on 3 integers at a time, this makes it slightly more inefficient than ideal. Another obstacle was that due to making it such that it only works on 3 integers at a time, there were always some elements that do not get solved for. To rectify this, we used the serial asm x86-64 implementation to solve for the last couple elements, this is slightly inefficient but also ensures that no violationError occurs. As an example of the violationError, if we were on the last loop with only 3 elements left, the last packed integer of the last register would be the 16 bytes after the end of the allocated memory for the input array.
 
 #### Screenshots
@@ -245,9 +241,6 @@ ymm_1D_stencil:
 	ret
 ```
 
-//INSERT ACTUAL IN DEPTH DISCUSSION
--> mention register push pop, probably talk about +7 vs +8 problem, boundary handling (mention as a single run of the serial implementation etc.)
-
 This version uses YMM registers (256-bit) for SIMD operations. vpaddd instruction operates on 8 packed integers, doubling the parallelism compared to the XMM implementation. All in all, 13 registers are used in this code. 7 registers are used to get the seven input elements required for the stencil operation, and the other 6 registers are used for the vpaddd instructions for adding the input elements. Push and pop are used to preserve the values of the non-volatile registers such as ymm5-ymm13, rbx, rsi, rsp, and rdi used in this code. It will prevent unexpected values and behavior that can cause an issue to the program. Although theoretically, it'll work on 8 integers at a time, due to the possibility of a violationError, in which the program accesses memory that has not been allocated, it was changed such that it will only work on 7 integers at a time, this makes it slightly more inefficient than ideal. Another obstacle was that due to making it such that it only works on 7 integers at a time, some elements always do not get solved for. To rectify this, we used the serial asm x86-64 implementation to solve for the last couple elements, this is slightly inefficient but also ensures that no violationError occurs. As an example of the violationError, if we were on the last loop with only 7 elements left, the last packed integer of the last register would be the 32 bytes after the end of the allocated memory for the input array.
 
 
@@ -285,10 +278,6 @@ Execution times for each implementation are measured in both DEBUG and RELEASE m
 | x86 SIMD AVX2 ASM using YMM | 0.270087 ms | 28.226107 ms | 465.343303 ms |
 
 ## Performance Analysis
-// MOST IMPORTANT PART
--> analyze performance of different kernels, how many times faster, why is it faster, etc.
-As can be seen from the tables above, ....
-
 As can be seen from the tables above, the YMM register AVX2 ASM performed the best, with XMM register AVX2 ASM performing slightly behind. This is followed closely by C in release mode, then C in debug mode being moderately further behind, and lastly x86-64 ASM performing significantly slower than the rest. It is important to note that DEBUG/RELEASE mode only affects the C kernel implementation, and thus the repeated runs for the assembly implementations can simply be looked at as more data to draw conclusions from. Thus, we also learn from these values that there is a significant amount of experimental difference between multiple runs of the same configurations, likely due to the input array sizes being significantly large. Thus it can be said that 30 executions is not nearly enough to expertly conclude precise differences in performance due to the fluctations, especially with some of the gaps going anywhere from 2-22% for XMM vs YMM AVX2, among others. 
 
 Regardless, we can generally say that YMM AVX2 ASM implementation is able to perform consistently the best, with XMM AVX2 ASM and Release Mode C close behind and perform competitvely with each other, with edge cases allowing C Release Mode to perform better. With these relatively close in performance, the next would be the unoptimized C Debug Mode, being 300-500% slower than the initial cluster of best performing implementations (C Release, YMM AVX2, XMM AVX2). Last is the x86-64 ASM implementation, being around 280% slower than C in Debug Mode. This brings the total performance gap between YMM AVX2 and x86-64 ASM to hover around 3000%.
@@ -297,13 +286,9 @@ The easiest to take a look at would be the x86-64 ASM implementation and underst
 
 Both the AVX2 implementations utilize the SIMD paradigm to accelerate the executions by operating on more than one value; in this case 4 and 8 respectively. Due to the violationError considerations made, the implementations in practice operate on 3 and 7 new unique values instead. while this gives the impression that there is an over 2.33x hypothetical performance gain, our results show otherwise, leading us to speculate how an implementation that operates 3 new values per iteration can perform close to an implementation that operates 7 new values. 
 
-The improvement of C when optimized in Release Mode vs when unoptimized in Debug Mode is also interesting to see, as the compiler is able to use optimizations invisible to the user which allows the code to compete with SIMD AVX2 implementations, 
-
+The improvement of C when optimized in Release Mode vs when unoptimized in Debug Mode is also interesting to see, as the compiler is able to use optimizations invisible to the user which allows the code to compete with SIMD AVX2 implementations in performance.
 
 Overall, **the SIMD AVX2 with YMM implementation is the fastest and most efficient among the 4 implementations, with the SIMD AVX2 with XMM implementation close behind**. The YMM implementation takes full advantage of AVX2 instructions and 256-bit registers to improve performance significantly over C and x86-64 assembly versions, with the XMM implementation's utilization of AVX2 and 128-bit registers allowing it to compete. The results clearly show the effectiveness of SIMD parallelism in optimizing computationally expensive operations. 
 
 ## Additional Discussion
-//Also relatively important, can be just a general info dump of anything learned in the project process (looking at u anton)
--> any problems and consequent solutions, unique methods used, AHA moments (importance of non-volatile register value saving to the stack in release mode)
-
 Non-volatile registers (such as rbx, rsi, rdi, rsp, ymm5-ymm13, etc.) retain their values across function boundaries. Therefore, preserving their original value via push and pop is important. Pushing these registers onto the stack before using them within a function ensures the original values are preserved for the calling function when the function returns. The inability to retain the non-volatile's original value may lead to unexpected behavior when the function returns. In our case, the code was operating in debug mode but was broken in release mode.
