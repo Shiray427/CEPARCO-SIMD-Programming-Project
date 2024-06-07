@@ -75,7 +75,7 @@ This implementation utilized a nested loop to achieve the stencil operation. the
 ![ASM_Output_26_rel](Screenshots/ASM_Output_26_rel.png)
 ##### x86-64 ASM Output at 2^30 (Debug)
 ![ASM_Output_30](Screenshots/ASM_Output_30.png)
-##### x86-64 ASM Output at 2^20 (Release)
+##### x86-64 ASM Output at 2^30 (Release)
 ![ASM_Output_30_rel](Screenshots/ASM_Output_30_rel.png)
 
 ### x86 SIMD AVX2 ASM using XMM
@@ -156,7 +156,7 @@ This implementation uses XMM registers to perform SIMD operations and utilizes t
 ![XMM_Output_26_rel](Screenshots/XMM_Output_26_rel.png)
 ##### x86 SIMD AVX2 using XMM Output at 2^30 (Debug)
 ![XMM_Output_30](Screenshots/XMM_Output_30.png)
-##### x86 SIMD AVX2 using XMM Output at 2^20 (Release)
+##### x86 SIMD AVX2 using XMM Output at 2^30 (Release)
 ![XMM_Output_30_rel](Screenshots/XMM_Output_30_rel.png)
 
 ### x86 SIMD AVX2 ASM using YMM
@@ -261,7 +261,7 @@ This version uses YMM registers (256-bit) for SIMD operations vpaddd instruction
 ![YMM_Output_26_rel](Screenshots/YMM_Output_26_rel.png)
 ##### x86 SIMD AVX2 using YMM Output at 2^30 (Debug)
 ![YMM_Output_30](Screenshots/YMM_Output_30.png)
-##### x86 SIMD AVX2 using YMM Output at 2^20 (Release)
+##### x86 SIMD AVX2 using YMM Output at 2^30 (Release)
 ![YMM_Output_30_rel](Screenshots/YMM_Output_30_rel.png)
 
 ## Table of Execution Time
